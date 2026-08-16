@@ -39,7 +39,7 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; }
         
         .scroll-clean::-webkit-scrollbar { width: 6px; height: 6px; }
         .scroll-clean::-webkit-scrollbar-track { background: transparent; }
@@ -76,8 +76,8 @@
         .modal-bg { animation: fadeInOverlay 0.2s ease-out forwards; }
     </style>
 </head>
-<body class="flex flex-col w-full h-screen overflow-y-auto scroll-clean">
-    <div id="root" class="w-full min-h-full flex flex-col p-2 md:p-4 gap-3 md:gap-4 max-w-[1600px] mx-auto"></div>
+<body class="flex flex-col w-full h-[100dvh] overflow-y-auto lg:overflow-hidden scroll-clean">
+    <div id="root" class="w-full h-full flex flex-col p-2 md:p-4 gap-3 md:gap-4 max-w-[1600px] mx-auto"></div>
 
     <script type="text/babel">
         const { useState, useMemo, useRef, useEffect } = React;
@@ -462,41 +462,41 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
             const { curso, seccion, conflict, suggestions } = conflictData;
             return (
                 <div className="fixed inset-0 bg-slate-900/70 z-[120] flex items-center justify-center p-4 modal-bg">
-                    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative">
-                        <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 rounded-full bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors">
+                    <div className="bg-white rounded-3xl w-[95%] sm:w-full max-w-lg overflow-hidden shadow-2xl relative">
+                        <button onClick={onClose} className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors">
                             <i className="fa-solid fa-xmark"></i>
                         </button>
 
-                        <div className="p-8 pb-6 flex flex-col items-center text-center">
-                            <div className="w-16 h-16 bg-red-100 text-red-500 rounded-2xl flex items-center justify-center text-3xl mb-4 border-2 border-red-50">
+                        <div className="p-6 sm:p-8 pb-4 sm:pb-6 flex flex-col items-center text-center">
+                            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-red-100 text-red-500 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-4 border-2 border-red-50">
                                 <i className="fa-solid fa-triangle-exclamation"></i>
                             </div>
                             
-                            <h3 className="text-xl font-black text-slate-800 mb-2">¡Cruce de Horario Detectado!</h3>
-                            <p className="text-sm text-slate-500 font-medium mb-6">La sección <strong className="text-red-500">{seccion}</strong> del curso <strong className="text-slate-700">{curso.nombre}</strong> genera un cruce.</p>
+                            <h3 className="text-lg sm:text-xl font-black text-slate-800 mb-2">¡Cruce de Horario Detectado!</h3>
+                            <p className="text-xs sm:text-sm text-slate-500 font-medium mb-4 sm:mb-6">La sección <strong className="text-red-500">{seccion}</strong> del curso <strong className="text-slate-700">{curso.nombre}</strong> genera un cruce.</p>
 
-                            <div className="w-full bg-red-50 border border-red-200 rounded-xl p-4 text-left mb-6">
-                                <p className="text-xs text-red-800 font-medium leading-relaxed">
+                            <div className="w-full bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4 text-left mb-4 sm:mb-6">
+                                <p className="text-[11px] sm:text-xs text-red-800 font-medium leading-relaxed">
                                     <strong className="text-red-900">Detalle del cruce:</strong> El día <strong className="text-red-900">{conflict.dia}</strong> a las <strong className="text-red-900">{conflict.inicio} - {conflict.fin}</strong> se cruza a la misma hora con tu clase inscrita de <strong className="text-red-900">{conflict.oldCourseName}</strong>.
                                 </p>
                             </div>
 
-                            <div className="w-full bg-[#f0fdf4] border border-[#bbf7d0] rounded-xl p-4 text-left">
-                                <h4 className="text-xs font-bold text-[#166534] flex items-center gap-2 mb-3">
+                            <div className="w-full bg-[#f0fdf4] border border-[#bbf7d0] rounded-xl p-3 sm:p-4 text-left">
+                                <h4 className="text-[11px] sm:text-xs font-bold text-[#166534] flex items-center gap-2 mb-2 sm:mb-3">
                                     <i className="fa-solid fa-wand-magic-sparkles"></i> Sugerencia Inteligente de Secciones Libres
                                 </h4>
                                 
                                 {suggestions.length > 0 ? (
                                     <>
-                                        <p className="text-[10px] text-[#15803d] mb-3">Las siguientes secciones de este curso están <strong>libres y no se cruzan</strong> con tu horario actual:</p>
+                                        <p className="text-[9px] sm:text-[10px] text-[#15803d] mb-3">Las siguientes secciones de este curso están <strong>libres y no se cruzan</strong> con tu horario actual:</p>
                                         <div className="space-y-2 max-h-32 overflow-y-auto scroll-clean pr-1">
                                             {suggestions.map(sug => (
-                                                <div key={sug.id} className="bg-white border border-[#dcfce7] rounded-lg p-3 flex justify-between items-center shadow-sm">
-                                                    <div>
-                                                        <div className="font-bold text-[#166534] text-xs">Sección {sug.seccion}</div>
-                                                        <div className="text-[9px] text-[#15803d] uppercase mt-0.5 truncate w-[180px]">{sug.docente}</div>
+                                                <div key={sug.id} className="bg-white border border-[#dcfce7] rounded-lg p-2.5 sm:p-3 flex justify-between items-center shadow-sm">
+                                                    <div className="flex-1 min-w-0 mr-2">
+                                                        <div className="font-bold text-[#166534] text-[11px] sm:text-xs">Sección {sug.seccion}</div>
+                                                        <div className="text-[8px] sm:text-[9px] text-[#15803d] uppercase mt-0.5 truncate w-full">{sug.docente}</div>
                                                     </div>
-                                                    <button onClick={() => onSelectSuggestion(sug)} className="bg-[#10b981] hover:bg-[#059669] text-white px-3 py-1.5 rounded-md text-[10px] font-bold transition flex items-center gap-1.5 shadow-sm">
+                                                    <button onClick={() => onSelectSuggestion(sug)} className="bg-[#10b981] hover:bg-[#059669] text-white px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-md text-[9px] sm:text-[10px] font-bold transition flex items-center gap-1.5 shadow-sm shrink-0">
                                                         <i className="fa-regular fa-circle-check"></i> Seleccionar
                                                     </button>
                                                 </div>
@@ -504,16 +504,16 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                                         </div>
                                     </>
                                 ) : (
-                                    <p className="text-[10px] text-[#15803d] bg-white p-3 rounded-lg border border-[#dcfce7]">Lo sentimos, no hay otras secciones disponibles para este curso que encajen en tu horario actual sin generar cruces.</p>
+                                    <p className="text-[9px] sm:text-[10px] text-[#15803d] bg-white p-3 rounded-lg border border-[#dcfce7]">Lo sentimos, no hay otras secciones disponibles para este curso que encajen en tu horario actual sin generar cruces.</p>
                                 )}
                             </div>
                         </div>
 
-                        <div className="px-8 py-5 border-t border-slate-100 bg-slate-50 flex gap-3">
-                            <button onClick={onClose} className="flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 py-2.5 rounded-xl text-xs font-bold transition">
+                        <div className="px-6 sm:px-8 py-4 sm:py-5 border-t border-slate-100 bg-slate-50 flex gap-2 sm:gap-3">
+                            <button onClick={onClose} className="flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition">
                                 Cancelar
                             </button>
-                            <button onClick={onForceReplace} className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
+                            <button onClick={onForceReplace} className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition shadow-sm">
                                 Reemplazar Curso
                             </button>
                         </div>
@@ -527,25 +527,25 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
             if (!isOpen) return null;
             return (
                 <div className="fixed inset-0 bg-slate-900/70 z-[120] flex items-center justify-center p-4 modal-bg">
-                    <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative">
-                        <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-colors">
+                    <div className="bg-white rounded-3xl w-[95%] sm:w-full max-w-sm overflow-hidden shadow-2xl relative">
+                        <button onClick={onClose} className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-colors">
                             <i className="fa-solid fa-xmark"></i>
                         </button>
 
-                        <div className="p-8 pb-6 flex flex-col items-center text-center">
-                            <div className="w-16 h-16 bg-red-100 text-red-500 rounded-2xl flex items-center justify-center text-3xl mb-4 border-2 border-red-50">
+                        <div className="p-6 sm:p-8 pb-4 sm:pb-6 flex flex-col items-center text-center">
+                            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-red-100 text-red-500 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-4 border-2 border-red-50">
                                 <i className="fa-regular fa-trash-can"></i>
                             </div>
                             
-                            <h3 className="text-xl font-black text-slate-800 mb-2">Vaciar Horario</h3>
-                            <p className="text-sm text-slate-500 font-medium">¿Estás seguro de que deseas eliminar todos los cursos de tu horario? Esta acción se puede deshacer.</p>
+                            <h3 className="text-lg sm:text-xl font-black text-slate-800 mb-2">Vaciar Horario</h3>
+                            <p className="text-xs sm:text-sm text-slate-500 font-medium">¿Estás seguro de que deseas eliminar todos los cursos de tu horario? Esta acción se puede deshacer.</p>
                         </div>
 
-                        <div className="px-8 py-5 border-t border-slate-100 bg-slate-50 flex gap-3">
-                            <button onClick={onClose} className="flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 py-2.5 rounded-xl text-xs font-bold transition">
+                        <div className="px-6 sm:px-8 py-4 sm:py-5 border-t border-slate-100 bg-slate-50 flex gap-2 sm:gap-3">
+                            <button onClick={onClose} className="flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition">
                                 Cancelar
                             </button>
-                            <button onClick={onConfirm} className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
+                            <button onClick={onConfirm} className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition shadow-sm">
                                 Sí, vaciar
                             </button>
                         </div>
@@ -853,88 +853,88 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                     <ClearModal isOpen={isClearModalOpen} onClose={() => setIsClearModalOpen(false)} onConfirm={confirmLimpiarHorario} />
 
                     {toast.visible && (
-                        <div className={`fixed bottom-6 right-6 px-5 py-3 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex items-center gap-4 z-[110] animate-[popIn_0.3s_ease-out] border-2 ${toast.type === 'error' ? 'bg-white border-red-500' : 'bg-white border-emerald-500'}`}>
-                            <i className={`text-2xl ${toast.type === 'error' ? 'fa-solid fa-circle-exclamation text-red-500' : 'fa-solid fa-circle-check text-emerald-500'}`}></i>
-                            <div className={`text-sm font-bold ${toast.type === 'error' ? 'text-red-600' : 'text-slate-700'}`}>{toast.message}</div>
-                            <button onClick={() => setToast({visible: false})} className="text-slate-400 hover:text-slate-600 ml-2"><i className="fa-solid fa-xmark"></i></button>
+                        <div className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 px-4 sm:px-5 py-3 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex items-center gap-3 sm:gap-4 z-[110] animate-[popIn_0.3s_ease-out] border-2 max-w-[90%] sm:max-w-md ${toast.type === 'error' ? 'bg-white border-red-500' : 'bg-white border-emerald-500'}`}>
+                            <i className={`text-xl sm:text-2xl shrink-0 ${toast.type === 'error' ? 'fa-solid fa-circle-exclamation text-red-500' : 'fa-solid fa-circle-check text-emerald-500'}`}></i>
+                            <div className={`text-xs sm:text-sm font-bold ${toast.type === 'error' ? 'text-red-600' : 'text-slate-700'}`}>{toast.message}</div>
+                            <button onClick={() => setToast({visible: false})} className="text-slate-400 hover:text-slate-600 ml-auto pl-2 shrink-0"><i className="fa-solid fa-xmark"></i></button>
                         </div>
                     )}
 
-                    <header className="bg-white rounded-2xl shadow-sm px-6 py-5 flex items-center justify-between shrink-0 border border-slate-200">
-                        <div className="flex items-center gap-5">
-                            <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shadow-inner">
-                                <i className="fa-solid fa-atom text-3xl text-brand-accent"></i>
+                    <header className="bg-white rounded-2xl shadow-sm px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between shrink-0 border border-slate-200 gap-2">
+                        <div className="flex items-center gap-3 sm:gap-5">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shadow-inner shrink-0">
+                                <i className="fa-solid fa-atom text-2xl sm:text-3xl text-brand-accent"></i>
                             </div>
                             <div>
-                                <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight leading-none mb-1">CEET FIQ Centro de Estudios <span className="text-brand">María Estela Toledo</span></h1>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Planificador 2026-B</span>
-                                    <span className="bg-brand-light text-brand border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-full hidden sm:inline-block shadow-sm">"Crecemos juntos, aprendemos mejor"</span>
+                                <h1 className="text-sm sm:text-xl md:text-2xl font-black text-slate-800 tracking-tight leading-tight sm:leading-none mb-0.5 sm:mb-1">CEET FIQ Centro de Estudios <span className="text-brand block sm:inline">María Estela Toledo</span></h1>
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Planificador 2026-B</span>
+                                    <span className="bg-brand-light text-brand border border-blue-200 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full hidden sm:inline-block shadow-sm truncate">"Crecemos juntos, aprendemos mejor"</span>
                                 </div>
                             </div>
                         </div>
-                        <button className="w-10 h-10 rounded-xl border border-slate-200 text-slate-400 hover:text-brand-accent hover:border-blue-200 hover:bg-blue-50 flex items-center justify-center transition shadow-sm">
-                            <i className="fa-solid fa-shield-halved"></i>
+                        <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl border border-slate-200 text-slate-400 hover:text-brand-accent hover:border-blue-200 hover:bg-blue-50 flex items-center justify-center transition shadow-sm shrink-0">
+                            <i className="fa-solid fa-shield-halved text-sm sm:text-base"></i>
                         </button>
                     </header>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 shrink-0">
-                        <div className={`bg-white border ${totalCreditos < MIN_CREDITOS ? 'border-amber-300' : 'border-slate-200'} rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden shadow-sm hover:shadow-md transition`}>
-                            <div className={`w-10 h-10 rounded-xl ${totalCreditos < MIN_CREDITOS ? 'bg-amber-50 text-amber-500 border-amber-200' : 'bg-brand-light text-brand border-blue-100'} flex items-center justify-center text-base border`}><i className="fa-solid fa-award"></i></div>
-                            <div className="flex-1">
-                                <p className={`text-2xl font-black ${totalCreditos < MIN_CREDITOS ? 'text-amber-600' : 'text-slate-800'} leading-none`}>{totalCreditos} <span className="text-xs font-bold text-slate-400">/ {MAX_CREDITOS} máx.</span></p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider">Créditos totales</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 shrink-0">
+                        <div className={`bg-white border ${totalCreditos < MIN_CREDITOS ? 'border-amber-300' : 'border-slate-200'} rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 relative overflow-hidden shadow-sm hover:shadow-md transition`}>
+                            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl ${totalCreditos < MIN_CREDITOS ? 'bg-amber-50 text-amber-500 border-amber-200' : 'bg-brand-light text-brand border-blue-100'} flex items-center justify-center text-sm sm:text-base border shrink-0`}><i className="fa-solid fa-award"></i></div>
+                            <div className="flex-1 min-w-0">
+                                <p className={`text-xl sm:text-2xl font-black ${totalCreditos < MIN_CREDITOS ? 'text-amber-600' : 'text-slate-800'} leading-none truncate`}>{totalCreditos} <span className="text-[10px] sm:text-xs font-bold text-slate-400">/ {MAX_CREDITOS} máx.</span></p>
+                                <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider truncate">Créditos totales</p>
                             </div>
                             <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-slate-100 overflow-hidden"><div className={`h-full ${totalCreditos < MIN_CREDITOS ? 'bg-amber-400' : 'bg-brand-accent'} rounded-r-full transition-all duration-500`} style={{width: `${Math.min((totalCreditos/MAX_CREDITOS)*100, 100)}%`}}></div></div>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-base border border-indigo-100"><i className="fa-solid fa-book-open"></i></div>
-                            <div>
-                                <p className="text-2xl font-black text-slate-800 leading-none">{new Set(seccionesAgregadas.map(s=>s.cursoId)).size}</p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider">Cursos activos</p>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 shadow-sm hover:shadow-md transition">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-sm sm:text-base border border-indigo-100 shrink-0"><i className="fa-solid fa-book-open"></i></div>
+                            <div className="min-w-0">
+                                <p className="text-xl sm:text-2xl font-black text-slate-800 leading-none truncate">{new Set(seccionesAgregadas.map(s=>s.cursoId)).size}</p>
+                                <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider truncate">Cursos activos</p>
                             </div>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-base border ${crucesCount > 0 ? 'bg-red-50 text-red-500 border-red-100' : 'bg-emerald-50 text-emerald-500 border-emerald-100'}`}><i className="fa-solid fa-code-compare"></i></div>
-                            <div>
-                                <p className={`text-2xl font-black leading-none ${crucesCount > 0 ? 'text-red-600' : 'text-slate-800'}`}>{crucesCount}</p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider">Cruces de horario</p>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 shadow-sm hover:shadow-md transition">
+                            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-sm sm:text-base border shrink-0 ${crucesCount > 0 ? 'bg-red-50 text-red-500 border-red-100' : 'bg-emerald-50 text-emerald-500 border-emerald-100'}`}><i className="fa-solid fa-code-compare"></i></div>
+                            <div className="min-w-0">
+                                <p className={`text-xl sm:text-2xl font-black leading-none truncate ${crucesCount > 0 ? 'text-red-600' : 'text-slate-800'}`}>{crucesCount}</p>
+                                <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider truncate">Cruces de horario</p>
                             </div>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition">
-                            <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-500 flex items-center justify-center text-base border border-cyan-100"><i className="fa-regular fa-clock"></i></div>
-                            <div>
-                                <p className="text-2xl font-black text-slate-800 leading-none">{horasSemanales}h</p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider">Horas de clase</p>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 shadow-sm hover:shadow-md transition">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-50 text-cyan-500 flex items-center justify-center text-sm sm:text-base border border-cyan-100 shrink-0"><i className="fa-regular fa-clock"></i></div>
+                            <div className="min-w-0">
+                                <p className="text-xl sm:text-2xl font-black text-slate-800 leading-none truncate">{horasSemanales}h</p>
+                                <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider truncate">Horas de clase</p>
                             </div>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 col-span-2 md:col-span-4 lg:col-span-1 shadow-sm hover:shadow-md transition">
-                            <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-500 flex items-center justify-center text-base border border-violet-100"><i className="fa-solid fa-mug-hot"></i></div>
-                            <div>
-                                <p className="text-2xl font-black text-slate-800 leading-none">{horasLibres}h</p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider">Tiempo libre</p>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 col-span-2 md:col-span-4 lg:col-span-1 shadow-sm hover:shadow-md transition">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-violet-50 text-violet-500 flex items-center justify-center text-sm sm:text-base border border-violet-100 shrink-0"><i className="fa-solid fa-mug-hot"></i></div>
+                            <div className="min-w-0">
+                                <p className="text-xl sm:text-2xl font-black text-slate-800 leading-none truncate">{horasLibres}h</p>
+                                <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider truncate">Tiempo libre</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-3 md:gap-4 pb-2">
                         
-                        <div className="w-full lg:w-[350px] shrink-0 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[500px] lg:h-auto overflow-hidden">
-                            <div className="p-5 border-b border-slate-100 bg-slate-50/50">
-                                <h2 className="font-black text-base text-slate-800 mb-4 flex items-center gap-2"><i className="fa-solid fa-layer-group text-brand-accent"></i> Catálogo de Cursos</h2>
+                        <div className="w-full lg:w-[320px] xl:w-[350px] shrink-0 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[500px] lg:h-full overflow-hidden">
+                            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
+                                <h2 className="font-black text-sm sm:text-base text-slate-800 mb-3 sm:mb-4 flex items-center gap-2"><i className="fa-solid fa-layer-group text-brand-accent"></i> Catálogo de Cursos</h2>
                                 <div className="space-y-3">
                                     <div className="relative">
                                         <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                                        <input type="text" placeholder="Buscar curso, código o docente..." className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all shadow-sm" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+                                        <input type="text" placeholder="Buscar curso, código o docente..." className="w-full pl-10 pr-3 py-2 sm:py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all shadow-sm" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
                                     </div>
-                                    <select className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all cursor-pointer shadow-sm" value={filtroCiclo} onChange={(e) => setFiltroCiclo(e.target.value)}>
+                                    <select className="w-full px-3 py-2 sm:py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-600 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all cursor-pointer shadow-sm" value={filtroCiclo} onChange={(e) => setFiltroCiclo(e.target.value)}>
                                         <option value="Todos">Todos los ciclos</option>
                                         <option value="I">CICLO I</option><option value="II">CICLO II</option><option value="III">CICLO III</option><option value="IV">CICLO IV</option><option value="V">CICLO V</option><option value="VI">CICLO VI</option><option value="VII">CICLO VII</option><option value="VIII">CICLO VIII</option><option value="IX">CICLO IX</option><option value="X">CICLO X</option>
                                     </select>
                                 </div>
                             </div>
                             
-                            <div className="flex-1 overflow-y-auto scroll-clean p-4 bg-[#f8fafc]">
+                            <div className="flex-1 overflow-y-auto scroll-clean p-3 sm:p-4 bg-[#f8fafc]">
                                 {Object.keys(cursosPorCiclo).map(cicloKey => (
                                     <div key={cicloKey} className="mb-6">
                                         <div className="flex justify-between items-center mb-3 px-1">
@@ -946,12 +946,12 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                                             const bColor = borderColors[idx % borderColors.length];
                                             return (
                                                 <div key={curso.id} className={`mb-4 bg-white border border-slate-200 border-l-[4px] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${bColor}`}>
-                                                    <div className="p-4">
+                                                    <div className="p-3 sm:p-4">
                                                         <div className="flex justify-between items-start mb-2">
-                                                            <h3 className="font-black text-[12px] uppercase text-slate-800 leading-tight pr-2">{curso.nombre}</h3>
+                                                            <h3 className="font-black text-[11px] sm:text-[12px] uppercase text-slate-800 leading-tight pr-2">{curso.nombre}</h3>
                                                             <span className="bg-slate-50 text-slate-500 border border-slate-200 text-[9px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap">{Object.keys(curso.seccionesBase).length} sec.</span>
                                                         </div>
-                                                        <div className="flex items-center gap-2 mb-4 text-[10px] text-slate-500 font-bold">
+                                                        <div className="flex items-center gap-2 mb-3 sm:mb-4 text-[9px] sm:text-[10px] text-slate-500 font-bold">
                                                             <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded uppercase border border-slate-200">{curso.codigo}</span>
                                                             <span>• {curso.creditos} Créditos</span>
                                                         </div>
@@ -968,24 +968,24 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                                                                 return (
                                                                     <div key={base.id} className="space-y-2">
                                                                         {hasTP && (
-                                                                            <div className={`border rounded-xl p-3 bg-white transition-all ${isTPAdded ? 'border-brand-accent ring-1 ring-brand-accent/30 bg-blue-50/50 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
+                                                                            <div className={`border rounded-xl p-2.5 sm:p-3 bg-white transition-all ${isTPAdded ? 'border-brand-accent ring-1 ring-brand-accent/30 bg-blue-50/50 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
                                                                                 <div className="flex justify-between items-center mb-3">
-                                                                                    <span className="bg-slate-50 text-slate-700 text-[10px] font-black px-2 py-1 rounded border border-slate-200 shadow-sm">SECCIÓN {base.seccion}</span>
+                                                                                    <span className="bg-slate-50 text-slate-700 text-[9px] sm:text-[10px] font-black px-2 py-1 rounded border border-slate-200 shadow-sm">SECCIÓN {base.seccion}</span>
                                                                                     <div className="flex items-center gap-2">
-                                                                                        <span className="text-[9px] text-slate-500 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{cupos} vac.</span>
-                                                                                        <button onClick={() => toggleSeccion(curso, tpID, base.seccion, base.tp, 'TP')} className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all border shadow-sm ${isTPAdded ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100' : 'bg-white border-slate-200 text-brand-accent hover:bg-slate-50 hover:border-blue-200'}`}>
-                                                                                            <i className={`fa-solid ${isTPAdded ? 'fa-minus text-xs' : 'fa-plus text-xs'}`}></i>
+                                                                                        <span className="text-[8px] sm:text-[9px] text-slate-500 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{cupos} vac.</span>
+                                                                                        <button onClick={() => toggleSeccion(curso, tpID, base.seccion, base.tp, 'TP')} className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all border shadow-sm ${isTPAdded ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100' : 'bg-white border-slate-200 text-brand-accent hover:bg-slate-50 hover:border-blue-200'}`}>
+                                                                                            <i className={`fa-solid ${isTPAdded ? 'fa-minus text-[10px] sm:text-xs' : 'fa-plus text-[10px] sm:text-xs'}`}></i>
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="space-y-1.5 mt-2">
                                                                                     {base.tp.map((h, i) => (
-                                                                                        <div key={i} className="text-[10px] border-b border-slate-100 pb-1.5 last:border-0 last:pb-0">
+                                                                                        <div key={i} className="text-[9px] sm:text-[10px] border-b border-slate-100 pb-1.5 last:border-0 last:pb-0">
                                                                                             <div className="flex justify-between font-black text-slate-700 mb-1">
                                                                                                 <span>{h.dia} <span className="font-semibold text-slate-500 ml-1">{h.inicio} - {h.fin}</span></span>
                                                                                                 <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">{h.aula} [{h.tipo}]</span>
                                                                                             </div>
-                                                                                            <div className="text-slate-500 font-medium truncate" title={h.docente}><i className="fa-solid fa-user-tie text-[9px] mr-1.5 text-slate-400"></i>{h.docente}</div>
+                                                                                            <div className="text-slate-500 font-medium truncate" title={h.docente}><i className="fa-solid fa-user-tie text-[8px] sm:text-[9px] mr-1.5 text-slate-400"></i>{h.docente}</div>
                                                                                         </div>
                                                                                     ))}
                                                                                 </div>
@@ -993,7 +993,7 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                                                                         )}
 
                                                                         {labs.length > 0 && (
-                                                                            <div className="pl-3 border-l-2 border-brand-light space-y-2 mt-2 ml-2">
+                                                                            <div className="pl-2 sm:pl-3 border-l-2 border-brand-light space-y-2 mt-2 ml-1 sm:ml-2">
                                                                                 {labs.map(labSec => {
                                                                                     const labHorarios = base.labs[labSec];
                                                                                     const labID = `${curso.id}_${labSec}_LAB`;
@@ -1001,24 +1001,24 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                                                                                     const cupLab = labHorarios[0].cupos;
 
                                                                                     return (
-                                                                                        <div key={labSec} className={`border rounded-xl p-3 bg-white transition-all ${isLabAdded ? 'border-brand-accent ring-1 ring-brand-accent/30 bg-blue-50/50 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
+                                                                                        <div key={labSec} className={`border rounded-xl p-2.5 sm:p-3 bg-white transition-all ${isLabAdded ? 'border-brand-accent ring-1 ring-brand-accent/30 bg-blue-50/50 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
                                                                                             <div className="flex justify-between items-center mb-3">
-                                                                                                <span className="bg-slate-50 text-slate-700 text-[10px] font-black px-2 py-1 rounded border border-slate-200 shadow-sm">SEC {labSec} <span className="text-brand-accent">(LAB)</span></span>
+                                                                                                <span className="bg-slate-50 text-slate-700 text-[9px] sm:text-[10px] font-black px-2 py-1 rounded border border-slate-200 shadow-sm">SEC {labSec} <span className="text-brand-accent">(LAB)</span></span>
                                                                                                 <div className="flex items-center gap-2">
-                                                                                                    <span className="text-[9px] text-slate-500 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{cupLab} vac.</span>
-                                                                                                    <button onClick={() => toggleSeccion(curso, labID, labSec, labHorarios, 'LAB')} className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all border shadow-sm ${isLabAdded ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100' : 'bg-white border-slate-200 text-brand-accent hover:bg-slate-50 hover:border-blue-200'}`}>
-                                                                                                        <i className={`fa-solid ${isLabAdded ? 'fa-minus text-xs' : 'fa-plus text-xs'}`}></i>
+                                                                                                    <span className="text-[8px] sm:text-[9px] text-slate-500 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{cupLab} vac.</span>
+                                                                                                    <button onClick={() => toggleSeccion(curso, labID, labSec, labHorarios, 'LAB')} className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all border shadow-sm ${isLabAdded ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100' : 'bg-white border-slate-200 text-brand-accent hover:bg-slate-50 hover:border-blue-200'}`}>
+                                                                                                        <i className={`fa-solid ${isLabAdded ? 'fa-minus text-[10px] sm:text-xs' : 'fa-plus text-[10px] sm:text-xs'}`}></i>
                                                                                                     </button>
                                                                                                 </div>
                                                                                             </div>
                                                                                             <div className="space-y-1.5">
                                                                                                 {labHorarios.map((h, i) => (
-                                                                                                    <div key={i} className="text-[10px] border-b border-slate-100 pb-1.5 last:border-0 last:pb-0">
+                                                                                                    <div key={i} className="text-[9px] sm:text-[10px] border-b border-slate-100 pb-1.5 last:border-0 last:pb-0">
                                                                                                         <div className="flex justify-between font-black text-slate-700 mb-1">
                                                                                                             <span>{h.dia} <span className="font-semibold text-slate-500 ml-1">{h.inicio} - {h.fin}</span></span>
                                                                                                             <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">{h.aula}</span>
                                                                                                         </div>
-                                                                                                        <div className="text-slate-500 font-medium truncate" title={h.docente}><i className="fa-solid fa-flask text-[9px] mr-1.5 text-slate-400"></i>{h.docente}</div>
+                                                                                                        <div className="text-slate-500 font-medium truncate" title={h.docente}><i className="fa-solid fa-flask text-[8px] sm:text-[9px] mr-1.5 text-slate-400"></i>{h.docente}</div>
                                                                                                     </div>
                                                                                                 ))}
                                                                                             </div>
@@ -1041,26 +1041,25 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                         </div>
 
                         {/* PANEL DERECHO: CALENDARIO */}
-                        <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col min-h-[600px] lg:h-auto relative overflow-hidden">
+                        <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col min-h-[600px] lg:min-h-0 lg:h-full relative overflow-hidden">
                             
-                            {/* === CORRECCIÓN AQUÍ: Agregado "relative z-[60]" al header para que el dropdown no quede detrás del calendario === */}
-                            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white relative z-[60] flex-wrap gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-brand-accent flex items-center justify-center"><i className="fa-regular fa-calendar-days"></i></div>
-                                    <h2 className="font-black text-lg text-slate-800">Mi Horario</h2>
-                                    <span className="bg-slate-50 text-slate-500 border border-slate-200 text-[10px] font-bold px-2 py-1 rounded-md ml-2 uppercase tracking-wider">Vista Semanal</span>
+                            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white relative z-[60] gap-3 sm:gap-4">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-50 text-brand-accent flex items-center justify-center"><i className="fa-regular fa-calendar-days text-sm"></i></div>
+                                    <h2 className="font-black text-base sm:text-lg text-slate-800">Mi Horario</h2>
+                                    <span className="bg-slate-50 text-slate-500 border border-slate-200 text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-md ml-1 sm:ml-2 uppercase tracking-wider">Vista Semanal</span>
                                 </div>
-                                <div className="flex items-center gap-2 relative">
-                                    <button onClick={triggerLimpiarHorario} className="bg-white border border-red-200 text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                <div className="flex flex-wrap items-center gap-2 relative w-full sm:w-auto justify-end sm:justify-start">
+                                    <button onClick={triggerLimpiarHorario} className="bg-white border border-red-200 text-red-500 hover:bg-red-50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center gap-1.5 sm:gap-2 shadow-sm flex-1 sm:flex-none justify-center">
                                         <i className="fa-regular fa-trash-can"></i> Vaciar
                                     </button>
-                                    <button onClick={undoAction} disabled={historial.length === 0} className="bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 px-3 py-2 rounded-xl text-sm transition flex items-center justify-center disabled:opacity-50 shadow-sm" title="Deshacer">
+                                    <button onClick={undoAction} disabled={historial.length === 0} className="bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm transition flex items-center justify-center disabled:opacity-50 shadow-sm shrink-0" title="Deshacer">
                                         <i className="fa-solid fa-rotate-left"></i>
                                     </button>
                                     
-                                    <div className="relative">
-                                        <button onClick={() => setDropdownOpen(!dropdownOpen)} className="bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
-                                            <i className="fa-solid fa-cloud-arrow-down"></i> Exportar <i className="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                                    <div className="relative flex-1 sm:flex-none">
+                                        <button onClick={() => setDropdownOpen(!dropdownOpen)} className="w-full sm:w-auto bg-brand hover:bg-brand-dark text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm">
+                                            <i className="fa-solid fa-cloud-arrow-down"></i> Exportar <i className="fa-solid fa-chevron-down text-[9px] sm:text-[10px] ml-1"></i>
                                         </button>
                                         
                                         <div className={`absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-200 z-[100] overflow-hidden dropdown-menu ${dropdownOpen ? 'dropdown-open' : 'dropdown-closed'}`}>
@@ -1083,7 +1082,7 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                             </div>
 
                             <div className="flex-1 overflow-auto bg-white scroll-clean w-full relative">
-                                <div ref={calendarRef} className="min-w-[700px] lg:min-w-full relative" style={{ height: `${TOTAL_HORAS * 60 + 40}px` }}>
+                                <div ref={calendarRef} className="min-w-[800px] lg:min-w-full relative" style={{ height: `${TOTAL_HORAS * 60 + 40}px` }}>
                                     
                                     <div className="flex border-b border-slate-200 bg-[#f8fafc] sticky top-0 z-30 shadow-sm">
                                         <div className="w-16 border-r border-slate-200 shrink-0 flex items-center justify-center font-black text-[10px] text-slate-400 uppercase tracking-widest">Hora</div>
