@@ -39,7 +39,6 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        /* CORRECCIÓN 1: Se quitó el "overflow: hidden" y "height: 100vh" forzado de aquí para que Tailwind controle el responsivo */
         body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; }
         
         .scroll-clean::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -72,7 +71,6 @@
         .creator-text { font-weight: 900; letter-spacing: 0.2em; color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.4); font-size: 0.75rem; text-align: center; margin-bottom: 2px; z-index: 10; position: relative; text-transform: uppercase;}
         .copyright-text { color: #94a3b8; font-size: 0.65rem; text-align: center; letter-spacing: 0.05em; z-index: 10; position: relative;}
 
-        /* Modal Overlay FadeIn */
         @keyframes fadeInOverlay { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(4px); } }
         .modal-bg { animation: fadeInOverlay 0.2s ease-out forwards; }
     </style>
@@ -562,8 +560,8 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                 <div className="fixed inset-0 bg-slate-900/60 z-[200] flex items-center justify-center backdrop-blur-sm">
                     <div className="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center animate-[popIn_0.2s_ease-out]">
                         <div className="w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin mb-4"></div>
-                        <p className="font-bold text-slate-700">Generando archivo...</p>
-                        <p className="text-xs text-slate-500 mt-1">Por favor espera un momento</p>
+                        <p className="font-bold text-slate-700">Generando documento...</p>
+                        <p className="text-xs text-slate-500 mt-1">Alta resolución, por favor espera</p>
                     </div>
                 </div>
             );
@@ -782,81 +780,83 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                 return true;
             };
 
-            // MODIFICACIÓN: Lógica de exportación con ventana de carga y ajuste completo
-            const exportarPNG = () => {
+            // === LÓGICA CENTRAL DE EXPORTACIÓN (Canvas) ===
+            const generarCanvasAltaCalidad = async () => {
+                if(!hiddenExportRef.current) throw new Error("Referencia no encontrada");
+                
+                const target = hiddenExportRef.current;
+                const originalLeft = target.style.left;
+                
+                // Traer al viewport temporalmente para renderizado perfecto
+                target.style.left = '0px';
+                
+                // Pequeña pausa para asegurar actualización de DOM
+                await new Promise(r => setTimeout(r, 200));
+
+                const canvas = await html2canvas(target, { 
+                    scale: 3, // ALTA RESOLUCIÓN
+                    backgroundColor: '#ffffff',
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    windowWidth: 1400,
+                    width: 1400
+                });
+
+                // Ocultar de nuevo
+                target.style.left = originalLeft;
+                
+                return canvas;
+            };
+
+            const exportarPNG = async () => {
                 setDropdownOpen(false);
                 if (!validateExport()) return;
                 
                 setIsExporting(true);
                 
-                setTimeout(() => {
-                    if(hiddenExportRef.current) {
-                        const target = hiddenExportRef.current;
-                        const originalLeft = target.style.left;
-                        target.style.left = '0px';
-
-                        html2canvas(target, { 
-                            scale: 2, 
-                            backgroundColor: '#ffffff',
-                            useCORS: true,
-                            logging: false
-                        }).then(canvas => {
-                            target.style.left = originalLeft;
-                            const link = document.createElement('a');
-                            link.download = 'Horario_CEET_FIQ.png';
-                            link.href = canvas.toDataURL('image/png');
-                            link.click();
-                            setIsExporting(false);
-                            showToast("Exportación completada", 'success');
-                        }).catch(err => {
-                            console.error(err);
-                            setIsExporting(false);
-                            showToast("Error al exportar", 'error');
-                        });
-                    }
-                }, 500);
+                try {
+                    const canvas = await generarCanvasAltaCalidad();
+                    const link = document.createElement('a');
+                    link.download = 'Horario_CEET_FIQ.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    showToast("PNG exportado con éxito.", 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast("Error al exportar imagen.", 'error');
+                } finally {
+                    setIsExporting(false);
+                }
             };
 
-            const exportarWord = () => {
+            const exportarPDF = async () => {
                 setDropdownOpen(false);
                 if (!validateExport()) return;
 
-                let tableHtml = "<table border='1' style='width:100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11px;'>";
-                tableHtml += "<tr style='background-color:#1e40af; color:white;'><th>CURSO</th><th>SECCIÓN</th><th>DÍA</th><th>HORA</th><th>AULA</th><th>DOCENTE</th></tr>";
-                
-                seccionesAgregadas.forEach(sec => {
-                    sec.horarios.forEach(h => {
-                        tableHtml += `<tr>
-                            <td><b>${sec.nombreCurso}</b></td>
-                            <td>${h.seccionOriginal}</td>
-                            <td>${h.dia}</td>
-                            <td>${h.inicio} - ${h.fin}</td>
-                            <td>${h.aula}</td>
-                            <td>${h.docente}</td>
-                        </tr>`;
+                setIsExporting(true);
+
+                try {
+                    const canvas = await generarCanvasAltaCalidad();
+                    const imgData = canvas.toDataURL('image/png');
+                    
+                    // Crear un PDF dinámico que abrace el tamaño exacto del canvas generado
+                    const pdf = new jspdf.jsPDF({
+                        orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+                        unit: 'px',
+                        format: [canvas.width, canvas.height]
                     });
-                });
-                tableHtml += "</table>";
 
-                const docHtml = `
-                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                    <head><meta charset='utf-8'><title>Horario CEET FIQ</title></head>
-                    <body>
-                        <h2 style="color:#1e40af; text-align:center; font-family:Arial; margin-bottom:5px;">CEET FIQ Centro de Estudios María Estela Toledo</h2>
-                        <p style="color:#64748b; text-align:center; font-family:Arial; font-size:12px; margin-top:0;"><i>"Crecemos juntos, aprendemos mejor"</i></p>
-                        <h3 style="color:#334155; font-family:Arial;">Programación Horaria Oficial 2026-B</h3>
-                        ${tableHtml}
-                        <p style="color:#94a3b8; text-align:right; font-family:Arial; font-size:10px; margin-top:20px;">Creado por Sebastian</p>
-                    </body>
-                    </html>
-                `;
-
-                const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'Horario_CEET_FIQ.doc';
-                link.click();
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                    pdf.save('Horario_CEET_FIQ.pdf');
+                    
+                    showToast("PDF exportado con éxito.", 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast("Error al exportar PDF.", 'error');
+                } finally {
+                    setIsExporting(false);
+                }
             };
 
             const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -1021,7 +1021,7 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
 
                                                                                     return (
                                                                                         <div key={labSec} className={`border rounded-xl p-3 bg-white transition-all ${isLabAdded ? 'border-brand-accent ring-1 ring-brand-accent/30 bg-blue-50/50 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
-                                                                                            <div className="flex justify-between items-center mb-3">
+                                                                                        <div className="flex justify-between items-center mb-3">
                                                                                                 <span className="bg-slate-50 text-slate-700 text-[10px] font-black px-2 py-1 rounded border border-slate-200 shadow-sm">SEC {labSec} <span className="text-brand-accent">(LAB)</span></span>
                                                                                                 <div className="flex items-center gap-2">
                                                                                                     <span className="text-[9px] text-slate-500 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{cupLab} vac.</span>
@@ -1087,8 +1087,8 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                                                     <i className="fa-solid fa-image text-brand-accent w-4 text-center"></i> Alta Calidad (PNG)
                                                 </button>
                                                 <div className="h-px bg-slate-100 w-full my-1"></div>
-                                                <button onClick={exportarWord} className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-3 transition">
-                                                    <i className="fa-solid fa-file-word text-indigo-500 w-4 text-center"></i> Tabla Editable (DOC)
+                                                <button onClick={exportarPDF} className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
+                                                    <i className="fa-solid fa-file-pdf text-red-500 w-4 text-center"></i> Documento (PDF)
                                                 </button>
                                             </div>
                                         </div>
@@ -1174,13 +1174,18 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                         <div className="copyright-text">© 2026 UNAC - Centro Estudiantil. Todos los derechos reservados.</div>
                     </footer>
 
-                    {/* BLOQUE DE EXPORTACIÓN (CONTENEDOR OCULTO) */}
-                    <div ref={hiddenExportRef} className="bg-white" style={{width: '1400px', position: 'absolute', top: 0, left: '-20000px', padding: '50px', fontFamily: "'Inter', sans-serif", zIndex: -9999}}>
+                    {/* ========================================================= */}
+                    {/* BLOQUE DE EXPORTACIÓN (CONTENEDOR OCULTO PROFESIONAL) */}
+                    {/* ========================================================= */}
+                    <div ref={hiddenExportRef} className="bg-white" style={{width: '1400px', position: 'absolute', top: 0, left: '-20000px', padding: '60px', fontFamily: "'Inter', sans-serif", zIndex: -9999}}>
+                        
+                        {/* Marca de agua */}
                         <div style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-45deg)', fontSize: '130px', fontWeight: '900', color: 'rgba(59, 130, 246, 0.03)', whiteSpace: 'nowrap', zIndex: '0', pointerEvents: 'none', letterSpacing: '10px'}}>
                             CREADO POR SEBASTIAN
                         </div>
 
-                        <div style={{display: 'flex', alignItems: 'center', justifyItems: 'space-between', justifyContent: 'space-between', borderBottom: '5px solid #1e40af', paddingBottom: '25px', marginBottom: '25px', position: 'relative', zIndex: '1'}}>
+                        {/* Encabezado */}
+                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '5px solid #1e40af', paddingBottom: '25px', marginBottom: '25px', position: 'relative', zIndex: '1'}}>
                             <div style={{display: 'flex', alignItems: 'center', gap: '25px'}}>
                                 <div style={{width: '80px', height: '80px', backgroundColor: '#eff6ff', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #bfdbfe'}}>
                                     <i className="fa-solid fa-atom" style={{fontSize: '40px', color: '#3b82f6'}}></i>
@@ -1196,6 +1201,7 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                             </div>
                         </div>
 
+                        {/* Resumen */}
                         <div style={{display: 'flex', gap: '20px', marginBottom: '25px', position: 'relative', zIndex: '1'}}>
                             <div style={{backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', padding: '12px 25px', borderRadius: '12px', fontWeight: '800', color: '#1e40af', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '10px'}}>
                                 <i className="fa-solid fa-award"></i> Total Créditos: {totalCreditos} / {MAX_CREDITOS}
@@ -1205,24 +1211,41 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                             </div>
                         </div>
 
+                        {/* Tabla Calendario */}
                         <div style={{border: '3px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden', backgroundColor: 'white', position: 'relative', zIndex: '1', boxShadow: '0 10px 30px rgba(0,0,0,0.05)'}}>
-                            <div style={{display: 'flex', backgroundColor: '#f8fafc', borderBottom: '3px solid #e2e8f0'}}>
-                                <div style={{width: '70px', padding: '18px 0', textAlign: 'center', fontWeight: '900', color: '#64748b', fontSize: '13px', letterSpacing: '1px'}}>HORA</div>
+                            
+                            {/* Cabecera Días */}
+                            <div style={{display: 'flex', backgroundColor: '#f8fafc', borderBottom: '3px solid #e2e8f0', position: 'relative', zIndex: '20'}}>
+                                <div style={{width: '70px', padding: '18px 0', textAlign: 'center', fontWeight: '900', color: '#64748b', fontSize: '13px', letterSpacing: '1px', flexShrink: 0}}>HORA</div>
                                 {diasSemana.map(d => <div key={d} style={{flex: 1, padding: '18px 0', textAlign: 'center', fontWeight: '900', color: '#0f172a', fontSize: '15px', borderLeft: '2px solid #e2e8f0', textTransform: 'uppercase'}}>{d}</div>)}
                             </div>
+                            
+                            {/* Cuerpo de horas */}
                             <div style={{position: 'relative', height: `${TOTAL_HORAS * 60}px`}}>
-                                <div className="absolute inset-0 flex">
-                                    <div style={{width: '70px', borderRight: '2px solid #e2e8f0', backgroundColor: '#f8fafc'}}></div>
-                                    {diasSemana.map((_, i) => <div key={i} style={{flex: 1, borderRight: '1px solid #f1f5f9', backgroundImage: 'linear-gradient(to bottom, #f1f5f9 1px, transparent 1px)', backgroundSize: '100% 60px'}}></div>)}
+                                
+                                {/* Columnas de Fondo y Líneas Verticales */}
+                                <div className="absolute inset-0 flex" style={{pointerEvents: 'none'}}>
+                                    <div style={{width: '70px', borderRight: '2px solid #cbd5e1', backgroundColor: '#f8fafc', flexShrink: 0}}></div>
+                                    {diasSemana.map((_, i) => <div key={i} style={{flex: 1, borderRight: '1px solid #e2e8f0'}}></div>)}
                                 </div>
+                                
+                                {/* Líneas Horizontales Sólidas */}
+                                <div className="absolute inset-0" style={{marginLeft: '70px', pointerEvents: 'none'}}>
+                                    {Array.from({length: TOTAL_HORAS + 1}).map((_, i) => (
+                                        <div key={`h-line-${i}`} style={{height: '60px', width: '100%', borderTop: '1px solid #f1f5f9', boxSizing: 'border-box'}}></div>
+                                    ))}
+                                </div>
+
+                                {/* Textos de Horas a la izquierda */}
                                 <div className="absolute top-0 left-0" style={{width: '70px', textAlign: 'center', fontSize: '13px', color: '#475569', fontWeight: '800'}}>
                                     {Array.from({length: TOTAL_HORAS + 1}).map((_, i) => (
-                                        <div key={i} style={{height: '60px', position: 'relative', borderBottom: '1px solid #e2e8f0'}}>
-                                            <span style={{position: 'absolute', top: '-9px', left: 0, width: '100%', backgroundColor: 'white'}}>{formatHourLine(i + HORA_INICIO)}</span>
+                                        <div key={i} style={{height: '60px', position: 'relative', borderBottom: '1px solid #cbd5e1', boxSizing: 'border-box'}}>
+                                            <span style={{position: 'absolute', top: '-9px', left: 0, width: '100%', backgroundColor: 'transparent'}}>{formatHourLine(i + HORA_INICIO)}</span>
                                         </div>
                                     ))}
                                 </div>
                                 
+                                {/* BLOQUES DE CLASE - DISEÑO MINIMALISTA DENTRO DE LA TABLA */}
                                 {seccionesAgregadas.map((seccion, sIdx) => {
                                     const colores = [
                                         {bg: '#eff6ff', br: '#3b82f6', txt: '#1e40af'},
@@ -1242,18 +1265,37 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                                         return (
                                             <div 
                                                 key={`exp-${sIdx}-${hIdx}`}
-                                                style={{ position: 'absolute', top: `${offsetTop}px`, height: `${duration}px`, width: `calc((100% - 70px) / 6 - 12px)`, left: `calc(70px + ((100% - 70px) / 6) * ${colIndex} + 6px)`, backgroundColor: c.bg, borderLeft: `6px solid ${c.br}`, borderRadius: '12px', padding: '12px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}
+                                                style={{ 
+                                                    position: 'absolute', 
+                                                    top: `${offsetTop}px`, 
+                                                    height: `${duration}px`, 
+                                                    width: `calc((100% - 70px) / 6 - 12px)`, // Dejamos margen para que se vea limpio
+                                                    left: `calc(70px + ((100% - 70px) / 6) * ${colIndex} + 6px)`, 
+                                                    backgroundColor: c.bg, 
+                                                    borderLeft: `6px solid ${c.br}`, 
+                                                    borderRadius: '12px', 
+                                                    padding: '10px 8px', 
+                                                    boxSizing: 'border-box', 
+                                                    display: 'flex', 
+                                                    flexDirection: 'column', 
+                                                    alignItems: 'center', 
+                                                    justifyContent: 'center', // Centrado perfecto
+                                                    gap: '8px', // Espacio limpio entre el titulo y la info
+                                                    boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                                                    overflow: 'hidden'
+                                                }}
                                             >
-                                                <span style={{fontWeight: '900', color: '#0f172a', fontSize: '13px', marginBottom: '6px', textTransform: 'uppercase', lineHeight: '1.2'}}>{seccion.nombreCurso}</span>
-                                                <span style={{fontWeight: '800', color: c.txt, fontSize: '11px', marginBottom: '6px'}}>
-                                                    {seccion.codigo} • Sec. {seccion.seccion}
+                                                {/* SOLO EL NOMBRE DEL CURSO */}
+                                                <span style={{fontWeight: '900', color: '#0f172a', fontSize: '13px', textAlign: 'center', textTransform: 'uppercase', lineHeight: '1.2'}}>
+                                                    {seccion.nombreCurso}
                                                 </span>
-                                                <span style={{fontSize: '11px', fontWeight: '700', color: '#475569', marginBottom: '8px'}}>{horario.docente}</span>
-                                                <div style={{display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center'}}>
+                                                
+                                                {/* AULA Y HORA */}
+                                                <div style={{display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', justifyContent: 'center'}}>
                                                     <span style={{fontSize: '11px', fontWeight: '900', color: c.txt, backgroundColor: 'white', padding: '3px 8px', borderRadius: '6px', border: `1px solid ${c.br}40`}}>
-                                                        {horario.aula} | {horario.tipo}
+                                                        {horario.aula}
                                                     </span>
-                                                    <span style={{fontSize: '11px', fontWeight: '800', color: '#ef4444'}}>
+                                                    <span style={{fontSize: '11px', fontWeight: '800', color: '#ef4444', backgroundColor: 'white', padding: '3px 8px', borderRadius: '6px', border: `1px solid #fee2e2`}}>
                                                         <i className="fa-regular fa-clock"></i> {horario.inicio}-{horario.fin}
                                                     </span>
                                                 </div>
@@ -1263,7 +1305,43 @@ X	TRABAJO DE INVESTIGACIÓN - IFIV64 PLAN 2019* PORLLES LOARTE JOSE ANGEL - 0527
                                 })}
                             </div>
                         </div>
+
+                        {/* ========================================================= */}
+                        {/* LEYENDA (TIPO FOOTER INTELIGENTE)                         */}
+                        {/* ========================================================= */}
+                        <div style={{marginTop: '40px', backgroundColor: '#f8fafc', padding: '30px', borderRadius: '16px', border: '2px solid #e2e8f0', position: 'relative', zIndex: '1'}}>
+                            <h3 style={{margin: '0 0 20px 0', color: '#1e40af', fontSize: '20px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '2px solid #bfdbfe', paddingBottom: '10px'}}>
+                                <i className="fa-solid fa-list-check" style={{marginRight: '10px'}}></i>
+                                Detalle de Cursos y Docentes
+                            </h3>
+                            
+                            <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px'}}>
+                                {seccionesAgregadas.map((sec, sIdx) => {
+                                    const c = sec.itemType === 'LAB' ? {bg: '#f8fafc', br: '#64748b', txt: '#334155'} : ['#3b82f6', '#10b981', '#ec4899', '#f59e0b', '#8b5cf6'].map(color => ({bg: `${color}15`, br: color, txt: color}))[sIdx % 5];
+                                    
+                                    // Agrupar profesores (por si tiene distintos en diferentes días, aunque usualmente es uno)
+                                    const teachers = [...new Set(sec.horarios.map(h => h.docente))].join(' / ');
+                                    
+                                    return (
+                                        <div key={`leg-${sIdx}`} style={{display: 'flex', alignItems: 'center', backgroundColor: 'white', padding: '12px 20px', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: `6px solid ${c.br}`, boxShadow: '0 2px 4px rgba(0,0,0,0.02)'}}>
+                                            <div style={{flex: 1}}>
+                                                <div style={{fontSize: '14px', fontWeight: '900', color: '#0f172a', marginBottom: '6px', textTransform: 'uppercase'}}>{sec.nombreCurso}</div>
+                                                <div style={{fontSize: '12px', color: '#475569', fontWeight: '600', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
+                                                    <span style={{color: c.txt, fontWeight: '900', backgroundColor: c.bg, padding: '3px 8px', borderRadius: '6px', border: `1px solid ${c.br}30`}}>
+                                                        {sec.codigo} • Sec. {sec.seccion} ({sec.itemType})
+                                                    </span>
+                                                    <span style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+                                                        <i className="fa-solid fa-user-tie" style={{color: '#94a3b8'}}></i> {teachers}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
                         
+                        {/* Footer del documento exportado */}
                         <div style={{marginTop: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '2px solid #e2e8f0', paddingTop: '20px', position: 'relative', zIndex: '1'}}>
                             <p style={{margin: '0', fontSize: '14px', color: '#94a3b8', fontWeight: '600'}}>© 2026 UNAC - Todos los derechos reservados.</p>
                             <p style={{margin: '0', fontSize: '18px', color: '#3b82f6', fontWeight: '900', letterSpacing: '3px'}}>CREADO POR SEBASTIAN <i className="fa-solid fa-code" style={{marginLeft: '8px', color: '#60a5fa'}}></i></p>
